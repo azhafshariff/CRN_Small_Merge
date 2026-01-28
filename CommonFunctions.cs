@@ -32,13 +32,14 @@ namespace OM
         public static string PDFErrorMsg = "";
         string strDropdownErrorMessage = "</br></br> Procedure returned 0 rows. ";
 
+        public static long CRNType = 1;
         public static string CRNClientName = "Community Resource Network";
         public static string CRNSubClientName = "Community Resource Network";
         public static string CRNShortClientName = "CRN";
-        public static string CRNEmailUS = "", CRNPhone = "", CRNFax = "";
+        public static string CRNEmailUS = "";
         public static string CRNSMTPEmail = "";
-        public static string CRNEnvironment = "(Development)";
-        public static bool IsDisplayCRNEnvironment = true;
+        public static string CRNRegion = "Community Resource Network";
+        public static bool IsDisplayCRNRegion = true;
         public static string PageTitle = "Community Resource Network";
         public static string ReportTitleName = "Community Resource Network";
         public static string ReportGraphTitleName = "Community Resource Network";
@@ -55,6 +56,34 @@ namespace OM
 
         public static string EventDeleteHeaderPopuup = "Delete Event - Email Organizer";
         public static string EventDeclineHeaderPopuup = "Decline Event - Email Organizer";
+
+
+        #region ICCRN
+
+        public static long TimeFormatType = 1;
+
+        public static string TimeFormat
+        {
+            get
+            {
+                if (TimeFormatType == 1)
+                    return "hh:mm tt";
+                else
+                    return "HH:mm";
+            }
+        }
+
+        public static string MosqueDateFormat
+        {
+            get
+            {
+                return "ddd MM/dd";
+            }
+        }
+
+        #endregion
+
+
         public CommonFunctions()
             : base()
         {
@@ -65,29 +94,18 @@ namespace OM
         {
             try
             {
-                string strClientName = "";
-                #region Backbone Agency Details
-                CommonFunctions ObjFunction = new CommonFunctions();
-                DataTable dt = new DBProcedures().Proc_Backbone_Organization_Details_Select_By_Backbone_Organization_ID(1);
-                strClientName = dt.Rows[0].ItemArray[0].ToString();
-                CRNSubClientName = dt.Rows[0].ItemArray[1].ToString();
-                CRNShortClientName = dt.Rows[0].ItemArray[2].ToString();
-                CRNEmailUS = dt.Rows[0].ItemArray[3].ToString();
-                CRNPhone = dt.Rows[0].ItemArray[4].ToString();
-                CRNFax = dt.Rows[0].ItemArray[5].ToString();
-                #endregion
-                //strClientName = DBCRN_System_Value.GetCRN_System_Value(158).Char_Value;
-                //CRNSubClientName = DBCRN_System_Value.GetCRN_System_Value(159).Char_Value;
-                //CRNShortClientName = DBCRN_System_Value.GetCRN_System_Value(166).Char_Value;
-                CRNEnvironment = DBCRN_System_Value.GetCRN_System_Value(160).Char_Value;
-                //CRNEmailUS = DBCRN_System_Value.GetCRN_System_Value(105).Char_Value;
+                string strClientName = DBCRN_System_Value.GetCRN_System_Value(158).Char_Value;
+                CRNSubClientName = DBCRN_System_Value.GetCRN_System_Value(159).Char_Value;
+                CRNShortClientName = DBCRN_System_Value.GetCRN_System_Value(166).Char_Value;
+                CRNRegion = DBCRN_System_Value.GetCRN_System_Value(160).Char_Value;
+                CRNEmailUS = DBCRN_System_Value.GetCRN_System_Value(105).Char_Value;
                 CRNSMTPEmail = DBCRN_System_Value.GetCRN_System_Value(153).Char_Value;
-                IsDisplayCRNEnvironment = DBCRN_System_Value.GetCRN_System_Value(161).Bit_Value;
-                if (IsDisplayCRNEnvironment == true)
+                IsDisplayCRNRegion = DBCRN_System_Value.GetCRN_System_Value(161).Bit_Value;
+                if (IsDisplayCRNRegion == true)
                 {
-                    PageTitle = strClientName + " " + CRNSubClientName + " " + CRNEnvironment;
-                    ReportTitleName = strClientName + " " + CRNSubClientName + " " + CRNEnvironment;
-                    ReportGraphTitleName = strClientName + " " + CRNSubClientName + " " + CRNEnvironment;
+                    PageTitle = strClientName + " " + CRNSubClientName + " " + CRNRegion;
+                    ReportTitleName = strClientName + " " + CRNSubClientName + " " + CRNRegion;
+                    ReportGraphTitleName = strClientName + " " + CRNSubClientName + " " + CRNRegion;
                 }
                 else
                 {
@@ -96,7 +114,7 @@ namespace OM
                     ReportGraphTitleName = strClientName + " " + CRNSubClientName;
                 }
                 CRNClientName = strClientName;
-
+                CRNType = DBCRN_System_Value.GetCRN_System_Value(188).Numeric_Value;
             }
             catch (Exception exc)
             { }
@@ -1571,7 +1589,6 @@ namespace OM
             }
 
         }
-
         public DataTable FillComb(string Str, string NewName)
         {
             DataTable dt = new DataTable();
@@ -2146,7 +2163,6 @@ namespace OM
             imgHelp.Attributes.Add("onmouseout", "CloseHelp('" + divName + "');");
             imgHelp.Attributes.Add("onclick", "return false;");
         }
-
         public string GetConfigValue(string Value, int type)
         {
             if (type == 1)
@@ -3503,19 +3519,6 @@ namespace OM
             }
             return AgeGroupID;
         }
-
-        public bool CheckEmailID(string strEmailID)
-        {
-            bool flag = true;
-            if (strEmailID != "")
-            {
-                string pattern = @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"; // A basic regex pattern
-                Regex regex = new Regex(pattern);
-                flag = regex.IsMatch(strEmailID);
-            }
-            return flag;
-        }
-
     }
 
     public class DB_Code_Value_Type_Code
@@ -3692,22 +3695,6 @@ namespace OM
         public static int Client_Military_Affiliation
         {
             get { return 44; }
-        }
-        public static int Backbone_Organization_Status
-        {
-            get { return 45; }
-        }
-        public static int Backbone_Organization_Address_Status
-        {
-            get { return 46; }
-        }
-        public static int Backbone_Organization_Web_Link_Status
-        {
-            get { return 47; }
-        }
-        public static int Backbone_Organization_Web_Link_Type
-        {
-            get { return 48; }
         }
     }
 
@@ -3977,6 +3964,7 @@ namespace OM
         {
             get { return 329; }
         }
+
         public static int Organization_Detail_File_Type_Regular
         {
             get { return 332; }
@@ -4004,30 +3992,6 @@ namespace OM
         public static int OHP_Client_Status_No
         {
             get { return 340; }
-        }
-        public static int Backbone_Organization_Status_Active
-        {
-            get { return 348; }
-        }
-        public static int Backbone_Organization_Status_InActive
-        {
-            get { return 349; }
-        }
-        public static int Backbone_Organization_Address_Status_Active
-        {
-            get { return 350; }
-        }
-        public static int Backbone_Organization_Address_Status_InActive
-        {
-            get { return 351; }
-        }
-        public static int Backbone_Organization_Web_Link_Status_Active
-        {
-            get { return 352; }
-        }
-        public static int Backbone_Organization_Web_Link_Status_InActive
-        {
-            get { return 353; }
         }
     }
 
@@ -4068,10 +4032,6 @@ namespace OM
         public static string Numeric_Select
         {
             get { return "NUMERIC_SELECT"; }
-        }
-        public static string Numeric_USPS
-        {
-            get { return "NUMERIC_USPS"; }
         }
     }
 
@@ -4166,56 +4126,12 @@ namespace OM
         public EmailIDCollection EmailIDs { get; set; }
     }
 
+
     public class ViewRequestPara
     {
         public bool flageClientDetails = true;
         public bool flageEditClientDetails = true;
         public int RType = 0;
         public bool IsAnonymous = false;
-        public bool RequestClone = false;
-    }
-
-    public class Member_Type
-    {
-        public static int Admin
-        {
-            get { return 1; }
-        }
-        public static int Requestor
-        {
-            get { return 2; }
-        }
-        public static int Donor
-        {
-            get { return 3; }
-        }
-        public static int OrgAdmin
-        {
-            get { return 4; }
-        }
-        public static int SuperAdmin
-        {
-            get { return 5; }
-        }
-        public static int DistrictAdmin
-        {
-            get { return 6; }
-        }
-    }
-
-    public class Report_Screen
-    {
-        public static int Graphs_Requests
-        {
-            get { return 1; }
-        }
-        public static int Graphs_Organization
-        {
-            get { return 2; }
-        }
-        public static int Graphs_Active_Contributors
-        {
-            get { return 3; }
-        }
     }
 }
